@@ -68,6 +68,8 @@ Every number in the README comes from this page, and every number on this page c
 | identity provider's JWKS stopped | 40 ALLOW, see below | 3.9 / 12.4 ms | 0.9 s |
 | aegis-server unreachable (SDK side) | 40 DENY | 0.6 / 13.5 ms | n/a |
 
+![Recovery after each dependency outage](../results/figures/fig1_fail_closed.png)
+
 - **Denials are fast.** Requests during a fault were denied in about the time a healthy request takes. Nothing waited out a long timeout: cedar-sidecar's client trips a circuit breaker after 5 consecutive connection failures and then fails immediately.
 - **Recovery after a cedar-sidecar outage takes about 10 s.** That is the circuit breaker's cooldown (`_BREAKER_RECOVERY_SECONDS`). After it, one trial request is let through; if it succeeds, the breaker closes.
 - **A JWKS outage does not deny, by design.** Signing keys already fetched stay cached in the server, as with any OIDC relying party, so tokens signed with a known key keep verifying. A token signed with a new key would fail until the JWKS is back.
@@ -91,6 +93,8 @@ Every number in the README comes from this page, and every number on this page c
 |---|---|---|---|
 | 0.1.0 | 0 of 500 | 248 | 252 |
 | **0.2.0** | **500 of 500** | 0 | 0 |
+
+![Masking with overlapping policies, before and after](../results/figures/fig2_masking_merge.png)
 
 0.1.0 copied each matching policy's annotations into one map, so the last policy read won, and the order changed from request to request. Every request lost one of the two fields. The same happened to `approval_required` and `risk_tier`: a policy requiring approval could be overridden by another that did not.
 
@@ -119,6 +123,8 @@ Raw: [`results/latency.json`](../results/latency.json).
 - **Under load, the audit write dominates.** Each tenant's audit log is one hash chain, and appending to it takes a row lock on that tenant's chain head, so one tenant's decisions are recorded one at a time. That is the price of a chain in which no entry can be inserted, reordered or removed without detection.
 - **Single-use tokens cost a Redis write per token.** Identity checks took 0.2 ms with reusable tokens against 0.4 to 4.3 ms with single-use tokens (the replay guard writes each token's `jti`). Throughput was within run-to-run noise of each other (raw file, `reusable_tokens`).
 
+![Server time per stage](../results/figures/fig4_stages.png)
+
 ### The same load spread over 8 tenants
 
 Raw: [`results/latency_spread_1worker.json`](../results/latency_spread_1worker.json).
@@ -130,6 +136,8 @@ Raw: [`results/latency_spread_1worker.json`](../results/latency_spread_1worker.j
 | 50 | 281 req/s | 162 ms | 305 ms | 410 ms | 19.0 ms (vs 104.3) |
 
 Spreading the load removed most of the audit-lock wait and halved p95 at concurrency 25 and 50, which confirms the per-tenant lock as the cause of the single-tenant tail. Throughput did not rise and the median got worse: with the lock gone, every stage slowed evenly. That is the signature of one Python process saturating its event loop. The next limit is CPU in a single process.
+
+![Latency against concurrency, one tenant and eight](../results/figures/fig3_latency.png)
 
 ### Four worker processes
 
@@ -158,5 +166,7 @@ python -m benchmarks.fail_closed             # B2, about 1 min; stops and restar
 python -m benchmarks.annotation_merge --url http://localhost:8180 --label after   # B3
 python -m benchmarks.latency                 # B4, about 2 min
 ```
+
+Figures: `pip install matplotlib && python -m benchmarks.plots` redraws `results/figures/` from the committed JSON.
 
 Or all of them: `bash scripts/reproduce.sh`. Set `AEGIS_RESULTS_DIR=out` to keep your results from overwriting the committed ones. For the 4-worker rows, start the stack with `AEGIS_WORKERS=4` and pass `--server-workers 4`.

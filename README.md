@@ -138,7 +138,11 @@ Everything here comes from [docs/benchmarks.md](docs/benchmarks.md); each number
 | approval webhook | 40 of 40 denied | 1.2 s |
 | aegis-server (SDK side) | 40 of 40 denied | n/a |
 
+![Recovery after each dependency outage](results/figures/fig1_fail_closed.png)
+
 **A masking bug, found and fixed.** With two policies each masking a different field, the 0.1.0 sidecar dropped one of the fields on **500 of 500** requests (annotations were merged last-write-wins). 0.2.0 merges them strictly and masked both on 500 of 500 ([B3](docs/benchmarks.md#b3-overlapping-policies-and-masking-a-bug-found-and-fixed)).
+
+![Masking with overlapping policies, before and after](results/figures/fig2_masking_merge.png)
 
 **Latency: under 5 ms per decision unloaded** (p50 4.6 ms, p99 10.8 ms, client side, including the audit write). One replica handled about 300 to 350 decisions per second. Under load the limit is the per-tenant audit chain, which records one tenant's decisions one at a time; spreading the same load over 8 tenants cut the p95 at 25 concurrent clients from 261 ms to 123 ms ([B4](docs/benchmarks.md#b4-latency-throughput-and-where-the-time-goes)).
 
@@ -150,6 +154,10 @@ Everything here comes from [docs/benchmarks.md](docs/benchmarks.md); each number
 | 50 | 310 req/s | 60.4 ms | 541 ms | 797 ms |
 
 One replica, one tenant, one laptop, single runs. Four worker processes per container behaved unpredictably under high concurrency (B4 has the data); scale with replicas instead.
+
+![Latency against concurrency, one tenant and eight](results/figures/fig3_latency.png)
+
+![Server time per stage](results/figures/fig4_stages.png)
 
 ## What you get
 
@@ -199,6 +207,7 @@ One replica, one tenant, one laptop, single runs. Four worker processes per cont
 | Fault injection | `python -m benchmarks.fail_closed` → `results/fail_closed.json` |
 | Masking merge | `python -m benchmarks.annotation_merge --url http://localhost:8180 --label after` |
 | Latency | `python -m benchmarks.latency` → `results/latency.json` |
+| Figures | `pip install matplotlib && python -m benchmarks.plots` → `results/figures/` (reads only committed results) |
 | Everything | `bash scripts/reproduce.sh` |
 
 Set `AEGIS_RESULTS_DIR=out` to keep the committed results untouched.
