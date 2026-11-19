@@ -1,0 +1,103 @@
+{
+  "environment": {
+    "date": "2026-11-18",
+    "machine": "Darwin arm64",
+    "python": "3.11.8",
+    "stack": "docker-compose, single aegis-server replica, one machine",
+    "server_workers": 1
+  },
+  "spread_over_8_tenants": [
+    {
+      "tenants": 8,
+      "concurrency": 1,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 194.0,
+      "latency_ms": {
+        "p50": 4.8,
+        "p95": 7.2,
+        "p99": 10.0,
+        "max": 15.9,
+        "mean": 5.1
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 0.56,
+        "principal_validation": 0.36,
+        "policy_lookup": 0.0,
+        "cedar_call": 0.75,
+        "audit_write": 1.07
+      }
+    },
+    {
+      "tenants": 8,
+      "concurrency": 10,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 324.8,
+      "latency_ms": {
+        "p50": 28.1,
+        "p95": 41.4,
+        "p99": 122.9,
+        "max": 131.1,
+        "mean": 30.6
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 7.88,
+        "principal_validation": 5.4,
+        "policy_lookup": 0.02,
+        "cedar_call": 7.12,
+        "audit_write": 6.52
+      }
+    },
+    {
+      "tenants": 8,
+      "concurrency": 25,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 310.4,
+      "latency_ms": {
+        "p50": 74.3,
+        "p95": 123.0,
+        "p99": 161.4,
+        "max": 222.3,
+        "mean": 79.9
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 16.36,
+        "principal_validation": 12.13,
+        "policy_lookup": 0.0,
+        "cedar_call": 33.59,
+        "audit_write": 11.92
+      }
+    },
+    {
+      "tenants": 8,
+      "concurrency": 50,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 281.2,
+      "latency_ms": {
+        "p50": 162.4,
+        "p95": 305.1,
+        "p99": 410.4,
+        "max": 561.3,
+        "mean": 175.1
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 53.12,
+        "principal_validation": 17.85,
+        "policy_lookup": 0.12,
+        "cedar_call": 74.73,
+        "audit_write": 18.96
+      }
+    }
+  ]
+}

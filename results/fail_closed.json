@@ -1,0 +1,136 @@
+{
+  "environment": {
+    "date": "2026-11-18",
+    "machine": "Darwin arm64",
+    "python": "3.11.8",
+    "stack": "docker-compose, single aegis-server replica, one machine"
+  },
+  "per_fault_requests": 40,
+  "summary": {
+    "faults": 6,
+    "fail_open_allows": 0,
+    "errors_instead_of_decisions": 0,
+    "all_passed": true
+  },
+  "faults": [
+    {
+      "fault": "healthy stack (control)",
+      "action": "read_report",
+      "expected_while_down": "ALLOW",
+      "during": {
+        "requests": 40,
+        "outcomes": {
+          "ALLOW": 40
+        },
+        "latency_ms_p50": 5.9,
+        "latency_ms_max": 15.6
+      },
+      "fail_open_allows": 0,
+      "errors_instead_of_decisions": 0,
+      "seconds_to_recover": null,
+      "passed": true
+    },
+    {
+      "fault": "cedar-sidecar stopped",
+      "action": "read_report",
+      "expected_while_down": "DENY",
+      "during": {
+        "requests": 40,
+        "outcomes": {
+          "DENY": 40
+        },
+        "latency_ms_p50": 3.9,
+        "latency_ms_max": 35.6
+      },
+      "fail_open_allows": 0,
+      "errors_instead_of_decisions": 0,
+      "seconds_to_recover": 10.6,
+      "passed": true
+    },
+    {
+      "fault": "redis stopped",
+      "action": "read_report",
+      "expected_while_down": "DENY",
+      "during": {
+        "requests": 40,
+        "outcomes": {
+          "DENY": 40
+        },
+        "latency_ms_p50": 6.7,
+        "latency_ms_max": 16.4
+      },
+      "fail_open_allows": 0,
+      "errors_instead_of_decisions": 0,
+      "seconds_to_recover": 2.0,
+      "passed": true
+    },
+    {
+      "fault": "postgres stopped",
+      "action": "read_report",
+      "expected_while_down": "DENY",
+      "during": {
+        "requests": 40,
+        "outcomes": {
+          "DENY": 40
+        },
+        "latency_ms_p50": 10.4,
+        "latency_ms_max": 45.1
+      },
+      "fail_open_allows": 0,
+      "errors_instead_of_decisions": 0,
+      "seconds_to_recover": 1.1,
+      "passed": true
+    },
+    {
+      "fault": "approval webhook stopped",
+      "action": "wire_medium_funds",
+      "expected_while_down": "DENY",
+      "during": {
+        "requests": 40,
+        "outcomes": {
+          "DENY": 40
+        },
+        "latency_ms_p50": 11.9,
+        "latency_ms_max": 25.2
+      },
+      "fail_open_allows": 0,
+      "errors_instead_of_decisions": 0,
+      "seconds_to_recover": 1.2,
+      "passed": true
+    },
+    {
+      "fault": "identity provider (JWKS) stopped",
+      "action": "read_report",
+      "expected_while_down": "ALLOW",
+      "during": {
+        "requests": 40,
+        "outcomes": {
+          "ALLOW": 40
+        },
+        "latency_ms_p50": 3.9,
+        "latency_ms_max": 12.4
+      },
+      "fail_open_allows": 0,
+      "errors_instead_of_decisions": 0,
+      "seconds_to_recover": 0.9,
+      "passed": true
+    },
+    {
+      "fault": "aegis-server unreachable (SDK guard)",
+      "action": "read_report",
+      "expected_while_down": "DENY",
+      "during": {
+        "requests": 40,
+        "outcomes": {
+          "DENY": 40
+        },
+        "latency_ms_p50": 0.6,
+        "latency_ms_max": 13.5
+      },
+      "fail_open_allows": 0,
+      "errors_instead_of_decisions": 0,
+      "seconds_to_recover": null,
+      "passed": true
+    }
+  ]
+}

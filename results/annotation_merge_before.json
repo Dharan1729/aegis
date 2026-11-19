@@ -1,0 +1,16 @@
+{
+  "environment": {
+    "date": "2026-11-18",
+    "machine": "Darwin arm64",
+    "python": "3.11.8",
+    "stack": "docker-compose, single aegis-server replica, one machine",
+    "sidecar": "cedar-sidecar 0.1.0 (before the merge fix)"
+  },
+  "requests": 500,
+  "outcomes": {
+    "ssn": 252,
+    "salary": 248
+  },
+  "both_fields_masked": 0,
+  "a_field_left_unmasked": 500
+}

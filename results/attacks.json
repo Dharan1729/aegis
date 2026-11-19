@@ -1,0 +1,203 @@
+{
+  "environment": {
+    "date": "2026-11-18",
+    "machine": "Darwin arm64",
+    "python": "3.11.8",
+    "stack": "docker-compose, single aegis-server replica, one machine"
+  },
+  "summary": {
+    "cases": 23,
+    "attacks": 19,
+    "attacks_refused": 19,
+    "attacks_allowed": 0,
+    "controls": 4,
+    "controls_passed": 4,
+    "server_errors": 0
+  },
+  "cases": [
+    {
+      "name": "control: analyst reads a report",
+      "kind": "control",
+      "expected": "ALLOW",
+      "got": "ALLOW",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "control: overlapping permits combine their obligations",
+      "kind": "control",
+      "expected": "ALLOW",
+      "got": "ALLOW mask=['salary', 'ssn']",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "control: trusted agent may export",
+      "kind": "control",
+      "expected": "ALLOW",
+      "got": "ALLOW",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "role not permitted (default deny)",
+      "kind": "policy",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "forbid overrides a matching permit",
+      "kind": "policy",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "high-risk action refused by the approver",
+      "kind": "policy",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "agent impersonation through request context",
+      "kind": "policy",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "Cedar syntax injected into the action name",
+      "kind": "policy",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "Cedar syntax injected into the resource",
+      "kind": "policy",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "token signed by an attacker's key",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "algorithm confusion (HS256 with the public key)",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "unsigned token (alg none)",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "token from another issuer",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "another tenant's valid tokens under this tenant's header",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "service token presented as the user token",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "expired token",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "token issued in the future",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "token without a jti (single-use tenant)",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "replay: first use",
+      "kind": "control",
+      "expected": "ALLOW",
+      "got": "ALLOW",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "replay: same tokens again",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "unknown tenant",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "garbage token",
+      "kind": "identity",
+      "expected": "DENY",
+      "got": "DENY",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "Authorization header without Bearer",
+      "kind": "identity",
+      "expected": "REFUSED",
+      "got": "HTTP 401",
+      "status": 401,
+      "passed": true
+    }
+  ]
+}

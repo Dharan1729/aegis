@@ -1,0 +1,189 @@
+{
+  "environment": {
+    "date": "2026-11-18",
+    "machine": "Darwin arm64",
+    "python": "3.11.8",
+    "stack": "docker-compose, single aegis-server replica, one machine",
+    "server_workers": 1
+  },
+  "single_use_tokens": [
+    {
+      "concurrency": 1,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 200.7,
+      "latency_ms": {
+        "p50": 4.6,
+        "p95": 7.1,
+        "p99": 10.8,
+        "max": 17.7,
+        "mean": 4.9
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 0.55,
+        "principal_validation": 0.35,
+        "policy_lookup": 0.0,
+        "cedar_call": 0.75,
+        "audit_write": 1.05
+      }
+    },
+    {
+      "concurrency": 10,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 350.1,
+      "latency_ms": {
+        "p50": 26.2,
+        "p95": 45.2,
+        "p99": 61.2,
+        "max": 79.2,
+        "mean": 28.4
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 5.29,
+        "principal_validation": 3.29,
+        "policy_lookup": 0.0,
+        "cedar_call": 3.76,
+        "audit_write": 13.45
+      }
+    },
+    {
+      "concurrency": 25,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 317.5,
+      "latency_ms": {
+        "p50": 31.3,
+        "p95": 260.7,
+        "p99": 325.5,
+        "max": 348.8,
+        "mean": 78.2
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 6.44,
+        "principal_validation": 3.85,
+        "policy_lookup": 0.08,
+        "cedar_call": 4.66,
+        "audit_write": 59.04
+      }
+    },
+    {
+      "concurrency": 50,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 309.7,
+      "latency_ms": {
+        "p50": 60.4,
+        "p95": 541.2,
+        "p99": 796.8,
+        "max": 863.5,
+        "mean": 158.8
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 35.68,
+        "principal_validation": 4.3,
+        "policy_lookup": 0.01,
+        "cedar_call": 5.44,
+        "audit_write": 104.32
+      }
+    }
+  ],
+  "reusable_tokens": [
+    {
+      "concurrency": 1,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 189.8,
+      "latency_ms": {
+        "p50": 4.9,
+        "p95": 7.2,
+        "p99": 9.5,
+        "max": 28.5,
+        "mean": 5.2
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 0.6,
+        "principal_validation": 0.22,
+        "policy_lookup": 0.0,
+        "cedar_call": 0.77,
+        "audit_write": 1.13
+      }
+    },
+    {
+      "concurrency": 10,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 327.4,
+      "latency_ms": {
+        "p50": 27.5,
+        "p95": 52.0,
+        "p99": 73.1,
+        "max": 122.2,
+        "mean": 30.4
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 5.29,
+        "principal_validation": 0.23,
+        "policy_lookup": 0.0,
+        "cedar_call": 3.63,
+        "audit_write": 18.4
+      }
+    },
+    {
+      "concurrency": 25,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 339.2,
+      "latency_ms": {
+        "p50": 25.8,
+        "p95": 226.1,
+        "p99": 284.2,
+        "max": 346.0,
+        "mean": 73.2
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 5.93,
+        "principal_validation": 0.21,
+        "policy_lookup": 0.0,
+        "cedar_call": 4.79,
+        "audit_write": 58.09
+      }
+    },
+    {
+      "concurrency": 50,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 268.8,
+      "latency_ms": {
+        "p50": 68.2,
+        "p95": 757.3,
+        "p99": 953.9,
+        "max": 1034.3,
+        "mean": 183.9
+      },
+      "server_stage_mean_ms": {
+        "rate_limit": 40.19,
+        "principal_validation": 0.24,
+        "policy_lookup": 0.0,
+        "cedar_call": 7.06,
+        "audit_write": 129.39
+      }
+    }
+  ]
+}

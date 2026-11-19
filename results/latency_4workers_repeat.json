@@ -1,0 +1,76 @@
+{
+  "environment": {
+    "date": "2026-11-18",
+    "machine": "Darwin arm64",
+    "python": "3.11.8",
+    "stack": "docker-compose, single aegis-server replica, one machine",
+    "server_workers": 4
+  },
+  "spread_over_8_tenants": [
+    {
+      "tenants": 8,
+      "concurrency": 1,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 179.5,
+      "latency_ms": {
+        "p50": 4.8,
+        "p95": 9.4,
+        "p99": 14.1,
+        "max": 43.4,
+        "mean": 5.5
+      }
+    },
+    {
+      "tenants": 8,
+      "concurrency": 10,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 827.0,
+      "latency_ms": {
+        "p50": 9.5,
+        "p95": 20.6,
+        "p99": 33.0,
+        "max": 67.2,
+        "mean": 11.9
+      }
+    },
+    {
+      "tenants": 8,
+      "concurrency": 25,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 315.0,
+      "latency_ms": {
+        "p50": 55.0,
+        "p95": 205.5,
+        "p99": 335.5,
+        "max": 495.5,
+        "mean": 76.7
+      }
+    },
+    {
+      "tenants": 8,
+      "concurrency": 50,
+      "requests": 1000,
+      "outcomes": {
+        "ALLOW": 1000
+      },
+      "throughput_rps": 183.3,
+      "latency_ms": {
+        "p50": 158.1,
+        "p95": 824.2,
+        "p99": 1236.5,
+        "max": 1972.4,
+        "mean": 264.9
+      }
+    }
+  ],
+  "note": "Server stage means are omitted: with several uvicorn workers each /metrics scrape reads one worker's counters, so before/after deltas are not meaningful."
+}
