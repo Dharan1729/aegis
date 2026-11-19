@@ -1,0 +1,6 @@
+# Root config: benchmarks/, scripts/, approval-mock/. Each package under
+# aegis-*/ has its own [tool.ruff] in pyproject.toml.
+line-length = 110
+target-version = "py311"
+# Code snippets in the docs are written compact on purpose.
+extend-exclude = ["*.md"]

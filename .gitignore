@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+target/
+out/
+.env
+.DS_Store
+
+# Dev-only signing keypair: regenerate with scripts/gen_test_keys.py.
+dev/jwks/private_key.pem
+dev/jwks/jwks.json

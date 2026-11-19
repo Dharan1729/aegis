@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Aegis Policy Admin</title>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+  h1 { font-size: 1.3rem; }
+  h2 { font-size: 1rem; margin-top: 2rem; border-top: 1px solid #ddd; padding-top: 1rem; }
+  label { display: block; margin-top: 1rem; font-weight: 600; font-size: 0.85rem; }
+  input, textarea { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: 0.9rem; padding: 0.5rem; margin-top: 0.25rem; }
+  textarea { height: 220px; }
+  #schema { height: 140px; }
+  button { margin-top: 0.75rem; margin-right: 0.5rem; padding: 0.5rem 1rem; cursor: pointer; }
+  #result, #schemaResult { white-space: pre-wrap; margin-top: 1rem; padding: 0.75rem; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 0.85rem; }
+  .ok { background: #e6f4ea; color: #1e4620; }
+  .err { background: #fce8e6; color: #5f1412; }
+  #history { margin-top: 0.5rem; font-size: 0.85rem; color: #444; }
+  .hint { color: #666; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<h1>Aegis Policy Admin</h1>
+<p class="hint">
+  Validate runs real strict-mode Cedar schema validation if this tenant has a
+  schema saved below; otherwise it's syntax-only. Saving a policy pushes it
+  straight into the shared Redis cache and notifies every aegis-server
+  replica — no restart needed.
+</p>
+
+<label>Admin bearer token (OIDC access token with the "aegis:admin" scope)</label>
+<input id="token" type="password" placeholder="paste a token from your admin IdP — dev: python scripts/mint_token.py --sub you --iss https://idp.aegis-admin.test --scope aegis:admin" />
+
+<label>Tenant ID</label>
+<input id="tenant" placeholder="acme" />
+<button onclick="loadPolicy()">Load policy</button>
+<button onclick="loadSchema()">Load schema</button>
+
+<label>Cedar policy script</label>
+<textarea id="policy" spellcheck="false"></textarea>
+
+<div>
+  <button onclick="validatePolicy()">Validate</button>
+  <button onclick="savePolicy()">Save</button>
+  <button onclick="loadHistory()">Load history</button>
+</div>
+
+<div id="result"></div>
+<div id="history"></div>
+
+<h2>Cedar schema (optional, JSON format)</h2>
+<p class="hint">
+  Saving a schema here is what turns on real semantic validation for this
+  tenant (entity attributes, action <code>appliesTo</code> constraints) —
+  without one, validation only checks that a policy parses.
+</p>
+<textarea id="schema" spellcheck="false" placeholder='{"": {"entityTypes": {...}, "actions": {...}}}'></textarea>
+<div>
+  <button onclick="saveSchema()">Save schema</button>
+</div>
+<div id="schemaResult"></div>
+
+<script>
+function headers() {
+  return { "Content-Type": "application/json", "Authorization": "Bearer " + document.getElementById("token").value };
+}
+function showResult(elId, ok, text) {
+  const el = document.getElementById(elId);
+  el.className = ok ? "ok" : "err";
+  el.textContent = text;
+}
+async function loadPolicy() {
+  const tenant = document.getElementById("tenant").value;
+  const resp = await fetch(`/admin/policies/${tenant}`, { headers: headers() });
+  const body = await resp.json();
+  if (!resp.ok) return showResult("result", false, JSON.stringify(body, null, 2));
+  document.getElementById("policy").value = body.policy_script;
+  showResult("result", true, `Loaded version ${body.policy_version}, updated ${body.updated_at}`);
+}
+async function validatePolicy() {
+  const tenant_id = document.getElementById("tenant").value || null;
+  const policy_script = document.getElementById("policy").value;
+  const resp = await fetch(`/admin/policies/validate`, {
+    method: "POST", headers: headers(), body: JSON.stringify({ policy_script, tenant_id }),
+  });
+  const body = await resp.json();
+  showResult("result", resp.ok && body.valid, JSON.stringify(body, null, 2));
+}
+async function savePolicy() {
+  const tenant = document.getElementById("tenant").value;
+  const policy_script = document.getElementById("policy").value;
+  const resp = await fetch(`/admin/policies/${tenant}`, {
+    method: "PUT", headers: headers(), body: JSON.stringify({ policy_script }),
+  });
+  const body = await resp.json();
+  showResult("result", resp.ok, JSON.stringify(body, null, 2));
+}
+async function loadHistory() {
+  const tenant = document.getElementById("tenant").value;
+  const resp = await fetch(`/admin/policies/${tenant}/history`, { headers: headers() });
+  const body = await resp.json();
+  const el = document.getElementById("history");
+  if (!resp.ok) { el.textContent = JSON.stringify(body); return; }
+  el.innerHTML = "<b>History:</b><br>" + body.map(h => `${h.created_at} — ${h.policy_version}`).join("<br>");
+}
+async function loadSchema() {
+  const tenant = document.getElementById("tenant").value;
+  const resp = await fetch(`/admin/schema/${tenant}`, { headers: headers() });
+  const body = await resp.json();
+  if (!resp.ok) return showResult("schemaResult", false, JSON.stringify(body, null, 2));
+  document.getElementById("schema").value = body.cedar_schema || "";
+  showResult("schemaResult", true, body.cedar_schema ? "Loaded schema" : "No schema saved for this tenant yet");
+}
+async function saveSchema() {
+  const tenant = document.getElementById("tenant").value;
+  const cedar_schema = document.getElementById("schema").value;
+  const resp = await fetch(`/admin/schema/${tenant}`, {
+    method: "PUT", headers: headers(), body: JSON.stringify({ cedar_schema }),
+  });
+  const body = await resp.json();
+  showResult("schemaResult", resp.ok, JSON.stringify(body, null, 2));
+}
+</script>
+</body>
+</html>

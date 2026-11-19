@@ -1,0 +1,96 @@
+# Local development and evaluation stack. Not a production deployment:
+# fixed dev passwords, a dev JWKS, and a mock approval service.
+#
+#   python scripts/gen_test_keys.py && docker compose up --build -d
+#
+# Every published port binds to 127.0.0.1 and can be moved with an env
+# variable (AEGIS_PORT=18000 docker compose up ...). Tracing and metrics UIs:
+#
+#   AEGIS_OTLP_ENDPOINT=http://jaeger:4317 docker compose --profile observability up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: aegis
+      POSTGRES_PASSWORD: aegis
+      POSTGRES_DB: aegis
+    ports:
+      - "127.0.0.1:${AEGIS_PG_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aegis"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:${AEGIS_REDIS_PORT:-6380}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  # Serves dev/jwks/jwks.json: the public half of the dev signing key that
+  # scripts/mint_token.py signs with. Stands in for a real identity provider.
+  jwks-mock:
+    image: nginx:alpine
+    volumes:
+      - ./dev/jwks:/usr/share/nginx/html:ro
+    ports:
+      - "127.0.0.1:${AEGIS_JWKS_PORT:-9000}:80"
+
+  cedar-sidecar:
+    build: ./cedar-sidecar
+    ports:
+      - "127.0.0.1:${AEGIS_CEDAR_PORT:-8180}:8180"
+
+  # Stand-in for Slack/Teams/ticketing approvals: approves everything except
+  # actions with "large" in the name.
+  approval-mock:
+    build: ./approval-mock
+    environment:
+      # Must match the approval_webhook_hmac_secret seeded onto the tenant
+      # (scripts/seed_tenant.py, aegis-server/tests/conftest.py).
+      APPROVAL_WEBHOOK_HMAC_SECRET: dev-approval-webhook-secret
+    ports:
+      - "127.0.0.1:${AEGIS_APPROVAL_PORT:-8090}:8090"
+
+  aegis-server:
+    build: ./aegis-server
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+asyncpg://aegis:aegis@postgres:5432/aegis
+      CEDAR_SIDECAR_URL: http://cedar-sidecar:8180
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${AEGIS_OTLP_ENDPOINT:-}
+      WORKERS: ${AEGIS_WORKERS:-1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      cedar-sidecar:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${AEGIS_PORT:-8000}:8000"
+
+  jaeger:
+    profiles: [observability]
+    image: jaegertracing/all-in-one:1.60
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "127.0.0.1:${AEGIS_JAEGER_PORT:-16686}:16686"
+
+  prometheus:
+    profiles: [observability]
+    image: prom/prometheus:v2.55.1
+    volumes:
+      - ./dev/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "127.0.0.1:${AEGIS_PROMETHEUS_PORT:-9090}:9090"
+    depends_on:
+      - aegis-server

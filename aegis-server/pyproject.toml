@@ -1,0 +1,62 @@
+[project]
+name = "aegis-server"
+version = "0.2.0"
+description = "Aegis decision runtime: authorizes AI agent tool calls against Cedar policy"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+authors = [{name = "Dharan"}]
+readme = "README.md"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.8",
+    "pydantic-settings>=2.4",
+    "sqlalchemy[asyncio]>=2.0",
+    "asyncpg>=0.29",
+    "httpx>=0.27",
+    "pyjwt[crypto]>=2.9",
+    "redis>=5.0",
+    "alembic>=1.13",
+    "opentelemetry-api>=1.27",
+    "opentelemetry-sdk>=1.27",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.27",
+    "opentelemetry-instrumentation-fastapi>=0.48b0",
+    "prometheus-client>=0.20",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.6",
+    "mypy>=1.11",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+# B008: FastAPI's Depends(...)/Header(...) in a parameter default IS the
+# framework's documented pattern, not a real "mutable default" bug —
+# ruff's bugbear check predates widespread FastAPI use and doesn't know
+# to exempt it. This is a standard ignore for FastAPI codebases.
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+# ASYNC210: test functions synchronously call httpx.post inside an `async
+# def` test (needed for the async DB fixtures in the same test) — briefly
+# blocking the event loop is fine in a test, not something to redesign.
+"tests/*" = ["ASYNC210"]
