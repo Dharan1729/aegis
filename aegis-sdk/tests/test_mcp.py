@@ -4,7 +4,10 @@ mcp = pytest.importorskip("mcp")
 
 import asyncio
 
-from mcp.server.fastmcp import FastMCP
+try:  # mcp 2.x renamed FastMCP to MCPServer
+    from mcp.server.mcpserver import MCPServer as FastMCP
+except ImportError:
+    from mcp.server.fastmcp import FastMCP
 
 from aegis.adapters.mcp import AegisContext, governed
 from aegis.masking import MASK

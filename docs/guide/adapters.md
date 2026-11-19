@@ -94,17 +94,17 @@ await Runner.run(agent, prompt, context=AegisContext(...))
 MCP's authorization spec covers authentication (OAuth 2.1 and scopes). A scope cannot say "only this user, only these records, only with approval". `@governed` adds that decision to each tool, using whatever identity your server authenticated:
 
 ```python
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer   # mcp 2.x; on 1.x: from mcp.server.fastmcp import FastMCP
 from aegis.adapters.mcp import governed
 
-mcp = FastMCP("hr")
+mcp = MCPServer("hr")
 
 @mcp.tool()
 @governed(AegisClient(AEGIS_URL), context_provider=lambda **args: context_from_current_request())
 async def lookup_employee(employee_id: str) -> dict: ...
 ```
 
-It wraps the handler function, not a server class, so it works with any MCP server implementation. There is no default `context_provider`: how a host exposes the authenticated caller depends on how its authorization is wired.
+It wraps the handler function, not a server class, so it works with any MCP server implementation, and with both MCP 1.x (`FastMCP`) and 2.x (`MCPServer`); the tests run against whichever CI installs. There is no default `context_provider`: how a host exposes the authenticated caller depends on how its authorization is wired.
 
 ## Anything else
 

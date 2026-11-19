@@ -18,6 +18,8 @@ RUN pip install --no-cache-dir --prefix=/install .
 RUN pip install --no-cache-dir --prefix=/install --upgrade "msgpack>=1.2.1"
 
 FROM python:3.11-slim
+# Pick up Debian security fixes released after the base image was built.
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 # pip vendors its OWN internal copies of msgpack/setuptools at fixed old
 # versions (pip/_vendor/vendor.txt) for pip's own bootstrap use, isolated

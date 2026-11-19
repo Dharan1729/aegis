@@ -9,6 +9,8 @@ RUN pip install --no-cache-dir --prefix=/install "fastapi>=0.115" "uvicorn[stand
 RUN pip install --no-cache-dir --prefix=/install --upgrade "msgpack>=1.2.1"
 
 FROM python:3.11-slim
+# Pick up Debian security fixes released after the base image was built.
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 # See aegis-server/Dockerfile for why pip/setuptools/wheel are stripped
 # from the runtime image rather than just upgraded: pip vendors its own
