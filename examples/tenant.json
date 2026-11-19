@@ -1,0 +1,12 @@
+{
+  "jwks_uri_human": "http://jwks-mock:80/jwks.json",
+  "jwks_uri_service": "http://jwks-mock:80/jwks.json",
+  "expected_issuer_human": "https://idp.acme.test/human",
+  "expected_issuer_service": "https://idp.acme.test/service",
+  "expected_audience_human": null,
+  "expected_audience_service": null,
+  "single_use_tokens": true,
+  "rate_limit_per_minute": 600,
+  "approval_webhook_url": "http://approval-mock:8090/approve",
+  "approval_webhook_hmac_secret": "dev-approval-webhook-secret"
+}
